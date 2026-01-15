@@ -36,5 +36,36 @@ This suggests that modern consumption is increasingly **debt-driven**, not incom
 
 ---
 
-## 📁 Project Structure
+## 🛠 Tools Used
 
+- **Excel** — Data cleaning and inflation adjustment  
+- **PostgreSQL (SQL)** — Growth calculations, joins, correlations  
+- **Power BI** — Interactive dashboards and visualization  
+- **World Bank Data** — Global consumption, CPI, credit  
+- **RBI & National Accounts** — India household finance and PFCE  
+
+---
+
+## 📈 Methodology
+
+1. Collected consumption, CPI, credit, and inequality data for multiple countries  
+2. Converted nominal consumption into real terms using CPI  
+3. Calculated year-over-year growth in consumption and credit  
+4. Compared patterns across countries  
+5. Conducted a deep-dive into India using RBI household finance data  
+6. Visualized all findings in Power BI dashboards  
+
+---
+
+## 🎥 Video Explanation
+
+A short documentary-style walkthrough of this project is included in the `video/` folder and shared on LinkedIn as part of my **“How I Think Like an Analyst”** series.
+
+---
+
+## 👤 About this project
+
+This project reflects how I approach analytical problems:
+starting with curiosity, validating with data, and communicating insights clearly.
+
+It was built to demonstrate not just technical skills, but also **how I think as a data analyst.**
