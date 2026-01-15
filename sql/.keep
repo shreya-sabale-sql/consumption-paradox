@@ -1,1 +1,98 @@
+/* ===============================================
+   CONSUMPTION PARADOX PROJECT
+   Global + India Analysis
+   =============================================== */
 
+-- 1. Inspect raw data
+SELECT *
+FROM consumption_paradox
+LIMIT 20;
+
+-- 2. Data quality checks
+SELECT
+    COUNT(*) AS total_rows,
+    COUNT(consumption_real) AS cons_rows,
+    COUNT(credit_pct_gdp) AS credit_rows,
+    COUNT(cpi) AS cpi_rows
+FROM consumption_paradox;
+
+-- 3. Check duplicates
+SELECT
+    country,
+    year,
+    COUNT(*) AS row_count
+FROM consumption_paradox
+GROUP BY country, year
+HAVING COUNT(*) > 1;
+
+-- 4. Create cleaned analytical view
+CREATE OR REPLACE VIEW clean_consumption AS
+SELECT
+    country,
+    year,
+    consumption_real,
+    credit_pct_gdp,
+    cpi,
+    gini
+FROM consumption_paradox
+WHERE consumption_real IS NOT NULL
+  AND credit_pct_gdp IS NOT NULL
+  AND cpi IS NOT NULL;
+
+-- 5. Create growth metrics
+CREATE OR REPLACE VIEW growth_metrics AS
+SELECT
+    country,
+    year,
+    consumption_real,
+    credit_pct_gdp,
+
+    (consumption_real - LAG(consumption_real) OVER
+        (PARTITION BY country ORDER BY year))
+    / LAG(consumption_real) OVER
+        (PARTITION BY country ORDER BY year)
+    AS consumption_growth,
+
+    (credit_pct_gdp - LAG(credit_pct_gdp) OVER
+        (PARTITION BY country ORDER BY year))
+    / LAG(credit_pct_gdp) OVER
+        (PARTITION BY country ORDER BY year)
+    AS credit_growth
+FROM clean_consumption;
+
+-- 6. Global trends over time
+SELECT
+    year,
+    AVG(consumption_growth) AS avg_consumption_growth,
+    AVG(credit_growth) AS avg_credit_growth
+FROM growth_metrics
+GROUP BY year
+ORDER BY year;
+
+-- 7. Country-level averages
+SELECT
+    country,
+    AVG(consumption_growth) AS avg_cons_growth,
+    AVG(credit_growth) AS avg_credit_growth
+FROM growth_metrics
+GROUP BY country
+ORDER BY avg_credit_growth DESC;
+
+-- 8. Correlation between credit and consumption
+SELECT
+    country,
+    CORR(consumption_growth, credit_growth) AS credit_consumption_correlation
+FROM growth_metrics
+GROUP BY country
+ORDER BY credit_consumption_correlation DESC;
+
+-- 9. India deep-dive
+SELECT
+    year,
+    consumption_real,
+    credit_pct_gdp,
+    cpi,
+    gini
+FROM clean_consumption
+WHERE country = 'India'
+ORDER BY year;
